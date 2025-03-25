@@ -30,10 +30,15 @@ public class Beginning : MonoBehaviour
         {
             print(student);
         }
+        //https://github.com/professorcrazy/ProgrammeringsIntro2425
         //Print hver elevs gennemsnit. 
 
         //print karakterliste og gennemsnit i samme linje. 
 
+        // Lav et histogram
+        // - for hver elev
+        // - for hvert fag (index)
+        // - for alle elever og fag
 
 
         //Array
