@@ -10,6 +10,8 @@ public class Beginning : MonoBehaviour
     public List<int> myList = new List<int>() { 0, 1, 2};
 
     List<int[]> students = new List<int[]>();
+
+    [SerializeField] Transform histPrefab;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -25,6 +27,7 @@ public class Beginning : MonoBehaviour
         {
             students.Add(RandomGrades());
         }
+        
         //printer alle vores elevers karakter. 
         foreach (int[] student in students)
         {
@@ -32,31 +35,154 @@ public class Beginning : MonoBehaviour
         }
         //https://github.com/professorcrazy/ProgrammeringsIntro2425
         //Print hver elevs gennemsnit. 
+        print("Print student averages");
+        for (int i = 0; i < students.Count; i++)
+        {
+            print(Average(students[i]));
+        }
 
-        //print karakterliste og gennemsnit i samme linje. 
+        //print karakterliste og gennemsnit i samme linje.
+        print("Grades and average");
+        for (int i = 0; i < students.Count; i++)
+        {
+            print(StringifyArray(students[i]) + " # " + Average(students[i])); 
+        }
 
         // Lav et histogram
         // - for hver elev
+        HistVisualizer(HistArray(students[0]), Vector3.zero);
         // - for hvert fag (index)
+        List<int> dansk = new List<int>();
+        for (int i = 0; i < students.Count; i++)
+        {
+            dansk.Add(students[i][0]);
+        }
+        HistVisualizer(HistArray(dansk), Vector3.up * 3, 1, Average(dansk));
         // - for alle elever og fag
-
-
-        //Array
-        print("Print et array forlæns");
-        for (int i = 0; i < array.Length; i++)
+        List<int> allClassesAndStudents = new List<int>();
+        for (int i = 0; i < students.Count; i++)
         {
-            print(array[i]);
+            for (int j = 0; j < students[i].Length; j++)
+            {
+                allClassesAndStudents.Add(students[i][j]);
+            }
         }
+        HistVisualizer(HistArray(allClassesAndStudents), new Vector3(-8,0,0), 1/12f);
 
-        print("Print et array baglæns");
-        for (int i = array.Length-1; i >= 0 ; i--)
-        {
-            print(array[i]);
-        }
+        ////Array
+        //print("Print et array forlæns");
+        //for (int i = 0; i < array.Length; i++)
+        //{
+        //    print(array[i]);
+        //}
 
-        print("Grade average: " + Average(array));
+        //print("Print et array baglæns");
+        //for (int i = array.Length-1; i >= 0 ; i--)
+        //{
+        //    print(array[i]);
+        //}
+
+        //print("Grade average: " + Average(array));
     }
 
+    int[] HistArray(int[] array)
+    {
+        int[] histValues = new int[7];
+        for (int i = 0; i < array.Length; i++)
+        {
+            switch (array[i])
+            {
+                case -3:
+                    histValues[0]++;
+                    break;
+                case 0:
+                    histValues[1]++;
+                    break;
+                case 2:
+                    histValues[2]++;
+                    break;
+                case 4:
+                    histValues[3]++;
+                    break;
+                case 7:
+                    histValues[4]++;
+                    break;
+                case 10:
+                    histValues[5]++;
+                    break;
+                case 12:
+                    histValues[6]++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return histValues;
+    }
+
+    int[] HistArray(List<int> list)
+    {
+        int[] histValues = new int[7];
+        for (int i = 0; i < list.Count; i++)
+        {
+            switch (list[i])
+            {
+                case -3:
+                    histValues[0]++;
+                    break;
+                case 0:
+                    histValues[1]++;
+                    break;
+                case 2:
+                    histValues[2]++;
+                    break;
+                case 4:
+                    histValues[3]++;
+                    break;
+                case 7:
+                    histValues[4]++;
+                    break;
+                case 10:
+                    histValues[5]++;
+                    break;
+                case 12:
+                    histValues[6]++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return histValues;
+    }
+    void HistVisualizer(int[] array, Vector3 startPos) {
+        for (int i = 0; i < array.Length; i++)
+        {
+            Transform g = Instantiate(histPrefab, startPos + ((Vector3.right * i) + (Vector3.up * array[i]/2f)), Quaternion.identity).transform;
+            g.transform.localScale = new Vector3(g.localScale.x, array[i], 1);
+        }
+    }
+    void HistVisualizer(int[] array, Vector3 startPos, float yScaler)
+    {
+        for (int i = 0; i < array.Length; i++)
+        {
+            float yVal = array[i] * yScaler;
+            Transform g = Instantiate(histPrefab, startPos + ((Vector3.right * i) + (Vector3.up * (yVal / 2f))), Quaternion.identity).transform;
+            g.transform.localScale = new Vector3(g.localScale.x, yVal, 1);
+        }
+    }
+
+    void HistVisualizer(int[] array, Vector3 startPos, float yScaler, float average)
+    {
+        for (int i = 0; i < array.Length; i++)
+        {
+            float yVal = array[i] * yScaler;
+            Transform g = Instantiate(histPrefab, startPos + ((Vector3.right * i) + (Vector3.up * (yVal / 2f))), Quaternion.identity).transform;
+            g.transform.localScale = new Vector3(g.localScale.x, yVal, 1);
+        }
+        float yValAvg = average * yScaler;
+        Transform avgT = Instantiate(histPrefab, startPos + ((Vector3.right * ((array.Length/2f)-0.5f)) + (Vector3.up * (yValAvg / 2f))), Quaternion.identity).transform;
+        avgT.transform.localScale = new Vector3(array.Length, 0.1f, 1);
+    }
     //Funktions overloading (vi har taget og lavet en særregl for print funktionen så den kan printe et array)
     void print(int[] array)
     {
@@ -71,6 +197,21 @@ public class Beginning : MonoBehaviour
             toPrint += array[i] + ", "; 
         }
         print(toPrint);
+    }
+
+    string StringifyArray(int[] array)
+    {
+        string toPrint = "";
+        for (int i = 0; i < array.Length; i++)
+        {
+            if (i == array.Length - 1)
+            {
+                toPrint += array[i];
+                break;
+            }
+            toPrint += array[i] + ", ";
+        }
+        return (toPrint);
     }
     //Her har vi gjort det samme men for en liste
     void print(List<int> array)
@@ -94,7 +235,7 @@ public class Beginning : MonoBehaviour
         int[] tempGrades = new int[9];
         for (int i = 0; i < tempGrades.Length; i++)
         {
-            tempGrades[i] = gradeOptions[Random.Range(0, gradeOptions.Length - 1)];//Vi bruger Unitys random funktion
+            tempGrades[i] = gradeOptions[Random.Range(0, gradeOptions.Length)];//Vi bruger Unitys random funktion
         }
         return tempGrades;
     }
