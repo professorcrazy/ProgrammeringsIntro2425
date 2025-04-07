@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Beginning : MonoBehaviour
 {
@@ -12,17 +14,21 @@ public class Beginning : MonoBehaviour
     List<int[]> students = new List<int[]>();
 
     [SerializeField] Transform histPrefab;
-    
+
+    [SerializeField] GameObject canvasBarPrefab;
+    [SerializeField] GameObject canvasValuePrefab;
+    [SerializeField] GameObject canvasPanelPrefab;
+    [SerializeField] Transform canvasRef;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         print(message);
 
         //Liste med karakterer
-        students.Add(new int[] {0, 2,-3, 4, 7, 10, 7, 4, 10 }); //her er en simpel måde at tilføje et array til en liste
-        int[] bob = { 12, 2, -3, 10, 7, 7, 7, 4, 10}; //alternativt kan du lave dit int array først og derefter tilfæje det til din liste. 
+        students.Add(new int[] {0, 2,-3, 4, 7, 10, 7, 4, 10 }); //her er en simpel mï¿½de at tilfï¿½je et array til en liste
+        int[] bob = { 12, 2, -3, 10, 7, 7, 7, 4, 10}; //alternativt kan du lave dit int array fï¿½rst og derefter tilfï¿½je det til din liste. 
         students.Add(bob);
-        //Hvis vi skal tilføje flere elementer til vores liste kan vi bruge et loop og her bruger vi den funktion vi lavede som generer karakterlister.
+        //Hvis vi skal tilfï¿½je flere elementer til vores liste kan vi bruge et loop og her bruger vi den funktion vi lavede som generer karakterlister.
         for(int i = 0; i < 10; i++)
         {
             students.Add(RandomGrades());
@@ -50,14 +56,14 @@ public class Beginning : MonoBehaviour
 
         // Lav et histogram
         // - for hver elev
-        HistVisualizer(HistArray(students[0]), Vector3.zero);
+        HistVisualizer(HistArray(students[0]), new Vector3(3, 0, 0));
         // - for hvert fag (index)
         List<int> dansk = new List<int>();
         for (int i = 0; i < students.Count; i++)
         {
             dansk.Add(students[i][0]);
         }
-        HistVisualizer(HistArray(dansk), Vector3.up * 3, 1, Average(dansk));
+        HistVisualizer(HistArray(dansk), new Vector3(3, 3, 0), 1, Average(dansk));
         // - for alle elever og fag
         List<int> allClassesAndStudents = new List<int>();
         for (int i = 0; i < students.Count; i++)
@@ -67,16 +73,19 @@ public class Beginning : MonoBehaviour
                 allClassesAndStudents.Add(students[i][j]);
             }
         }
-        HistVisualizer(HistArray(allClassesAndStudents), new Vector3(-8,0,0), 1/12f);
+        HistVisualizer(HistArray(allClassesAndStudents), new Vector3(3,7,0), 1/12f);
 
+        HistVisualizerCanvas(HistArray(students[0]), new Vector3(30, 30, 0), 1);
+        HistVisualizerCanvas(HistArray(dansk), new Vector3(210, 30, 0), 1);
+        HistVisualizerCanvas(HistArray(allClassesAndStudents), new Vector3(390, 30, 0), 0.75f);
         ////Array
-        //print("Print et array forlæns");
+        //print("Print et array forlï¿½ns");
         //for (int i = 0; i < array.Length; i++)
         //{
         //    print(array[i]);
         //}
 
-        //print("Print et array baglæns");
+        //print("Print et array baglï¿½ns");
         //for (int i = array.Length-1; i >= 0 ; i--)
         //{
         //    print(array[i]);
@@ -183,7 +192,56 @@ public class Beginning : MonoBehaviour
         Transform avgT = Instantiate(histPrefab, startPos + ((Vector3.right * ((array.Length/2f)-0.5f)) + (Vector3.up * (yValAvg / 2f))), Quaternion.identity).transform;
         avgT.transform.localScale = new Vector3(array.Length, 0.1f, 1);
     }
-    //Funktions overloading (vi har taget og lavet en særregl for print funktionen så den kan printe et array)
+
+    int FindHighest(int[] array)
+    {
+        if (array.Length == 0)
+        {
+            return 0;
+        }
+        int curHighest = array[0];
+        for (int i = 1; i < array.Length; i++)
+        {
+            if (curHighest < array[i])
+            {
+                curHighest = array[i];
+            }
+        }
+        return curHighest;
+    }
+
+    void HistVisualizerCanvas(int[] array, Vector3 startPos, float scale)
+    {
+        Transform tempGraphPanel = Instantiate(canvasPanelPrefab, canvasRef).transform;
+        tempGraphPanel.transform.position = startPos;
+        int highestValue = FindHighest(array);
+        RectTransform rtYaxis = tempGraphPanel.Find("Y_Axis").GetComponent<RectTransform>();
+        rtYaxis.sizeDelta = new Vector2(5, 20 * highestValue + 20);
+        rtYaxis.localPosition = new Vector3(2.5f, highestValue * 10 + 10, 0);
+
+        for (int i = 0; i < highestValue + 1; i++)
+        {
+            Transform g = Instantiate(canvasValuePrefab, tempGraphPanel).transform;
+            g.localPosition = new Vector3(0, i * 20, 0);
+            //g.GetComponent<RectTransform>().rect.Set(i * 15, array[i] * 10, 5, array[i] * 20);
+            foreach (TMP_Text t in g.GetComponentsInChildren<TMP_Text>())
+            {
+                t.text = (i + 1).ToString();
+            }
+        }
+        for (int i = 0; i < array.Length; i++)
+        {
+            Transform g = Instantiate(canvasBarPrefab, tempGraphPanel).transform; //GetComponent<RectTransform>();
+            //g.rect.Set(i*25+5, array[i]*10, 5, array[i]*20);
+            g.localPosition = new Vector3(i * 20 + 20, array[i] * 10, 0);
+            
+            g.GetComponent<RectTransform>().sizeDelta = new Vector2(5, array[i] * 20);
+            //g.localScale = new Vector3(5, array[i] * 20, 0);
+        }
+        tempGraphPanel.localScale *= scale;
+
+    }
+    //Funktions overloading (vi har taget og lavet en sï¿½rregl for print funktionen sï¿½ den kan printe et array)
     void print(int[] array)
     {
         string toPrint = "";
@@ -228,7 +286,7 @@ public class Beginning : MonoBehaviour
         }
         print(toPrint);
     }
-//Generer tilfældige karaktere for eleverne. 
+//Generer tilfï¿½ldige karaktere for eleverne. 
     int[] RandomGrades()
     {
         int[] gradeOptions = { -3, 0, 2, 4, 7, 10, 12 };
