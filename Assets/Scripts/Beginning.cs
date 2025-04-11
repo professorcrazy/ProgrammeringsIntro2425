@@ -74,24 +74,11 @@ public class Beginning : MonoBehaviour
             }
         }
         HistVisualizer(HistArray(allClassesAndStudents), new Vector3(3,7,0), 1/12f);
-
+        //----------------- Canvas version -----------------\\
         HistVisualizerCanvas(HistArray(students[0]), new Vector3(30, 30, 0), 1);
         HistVisualizerCanvas(HistArray(dansk), new Vector3(210, 30, 0), 1);
         HistVisualizerCanvas(HistArray(allClassesAndStudents), new Vector3(390, 30, 0), 0.75f);
-        ////Array
-        //print("Print et array forl�ns");
-        //for (int i = 0; i < array.Length; i++)
-        //{
-        //    print(array[i]);
-        //}
 
-        //print("Print et array bagl�ns");
-        //for (int i = array.Length-1; i >= 0 ; i--)
-        //{
-        //    print(array[i]);
-        //}
-
-        //print("Grade average: " + Average(array));
     }
 
     int[] HistArray(int[] array)
@@ -353,4 +340,6 @@ public class Beginning : MonoBehaviour
         }
         return sum / grades.Count;
     }
+
+
 }
